@@ -8,8 +8,11 @@ using namespace std;
 struct vector2f{
     float x;
     float y;
+    float sqlength() const {
+        return x*x+y*y;
+    }
     float length() const{
-        return sqrt(x*x+y*y);
+        return sqrt(sqlength());
     }
     vector2f to_polar(){
         return {atan2f(y,x),length()};
@@ -17,7 +20,7 @@ struct vector2f{
 };
 //Перегрузка оператора вывода потока для vector2f
 ostream &operator<<(ostream &out,const vector2f &vect){
-    out<<"["<<vect.x<<","<<vect.y<<"]";
+    out<<vect.x<<" "<<vect.y;
     return out;
 }
 
@@ -30,8 +33,8 @@ int main()
     std::mt19937 rand_gen(time(nullptr));
 
     for(uint32_t i=0;i<n;++i){
-        points[i].x = (rand_gen())%200-100;
-        points[i].y = (rand_gen())%200-100;
+        points[i].x = (rand_gen())%199-100;
+        points[i].y = (rand_gen())%199-100;
     }
 
     const float rad = 80;
@@ -39,7 +42,8 @@ int main()
     //Фильтрация точек (длина Е (rad-dist,rad+dist))
     vector<vector2f> filtered;
     std::copy_if(points.begin(),points.end(),back_inserter(filtered),[rad,dist](vector2f &pt){
-        return abs(pt.length()-rad)<dist;
+        //abs(pt.length()-rad)<dist;
+        return pt.sqlength()>pow(rad-dist,2)&&pt.sqlength()<pow(rad+dist,2);
     });
 
     //Сортировка по значению угла в полярных координатах (против часовой стрелки)
